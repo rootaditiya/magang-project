@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: "inter", sans-serif;
+    @apply scroll-smooth bg-asnesia-gray/20 text-[12px] transform duration-300 delay-150;
+  }
