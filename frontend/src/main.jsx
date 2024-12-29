@@ -17,13 +17,77 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/login-or-signup",
+    path: "/login-or-register",
     element: <LoginRegister />,
   },
   {
     path: "/dashboard",
     element: (
-      <Dashboard>
+      <Dashboard menu='beranda'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/service-puscharge",
+    element: (
+      <Dashboard menu='my-packages'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/service-available",
+    element: (
+      <Dashboard menu='service-available'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/tryout",
+    element: (
+      <Dashboard menu='tryout'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <Dashboard menu='settings'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/order",
+    element: (
+      <Dashboard menu='order'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/discuss",
+    element: (
+      <Dashboard menu='discuss'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/modul",
+    element: (
+      <Dashboard menu='modul'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/video",
+    element: (
+      <Dashboard menu='video'>
         <Beranda />
       </Dashboard>
     ),

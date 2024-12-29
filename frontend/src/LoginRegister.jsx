@@ -9,7 +9,7 @@ const LoginRegister = () => {
   const [selected, setSelected] = useState("login");
 
   return (
-    <div className="flex flex-col w-full h-full justify-center items-center p-10">
+    <div className="flex flex-col w-full h-screen justify-center items-center">
       <Card className="max-w-full w-[400px] p-5">
         <FontAwesomeIcon icon={faArrowLeft} className={`self-start text-2xl font-medium mb-5`}/>
 
@@ -25,17 +25,17 @@ const LoginRegister = () => {
             </>
           ) : (
             <>
-              <h2>Daftar ke Asnesia</h2>
+              <h2 className={`text-2xl`}>Daftar ke Asnesia</h2>
               <p className={`w-4/5`}>Buat akun Appskep untuk melanjutkan ke Appskep CPNS</p>
             </>
           )}
         </div>
-        <CardBody className="overflow-hidden">
+        <CardBody className="overflow-hidden ">
           <Tabs
             fullWidth
             aria-label="Tabs form"
             selectedKey={selected}
-            size="md"
+            size="lg"
             onSelectionChange={setSelected}
           >
             <Tab key="login" title="Login">
