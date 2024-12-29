@@ -2,18 +2,63 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Brand from "../assets/brand.svg";
 import {
   Avatar,
+  Button,
+  ButtonGroup,
   Card,
   CardBody,
   CardHeader,
   Divider,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Image,
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
 import { Link } from "react-router";
-import { faChartLine, faClock, faComment, faCompass, faFile, faFolder, faGear, faPlay, faWallet } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretDown,
+  faChartLine,
+  faClock,
+  faComment,
+  faCompass,
+  faFile,
+  faFolder,
+  faGear,
+  faKey,
+  faPlay,
+  faRightFromBracket,
+  faUser,
+  faWallet,
+} from "@fortawesome/free-solid-svg-icons";
 
-const DashboardContent = () => {
-  return <div>Content</div>;
+const DashboardFooter = () => {
+  return (
+    <div className="dashboard-footer bg-asnesia-darkblue text-white px-10 py-5">
+      <p>
+        Copyright &copy; {new Date().getFullYear()}, All Rights Reserved.
+        <span className="font-semibold ml-2">APPSKEP</span>
+      </p>
+      <p className="text-sm mt-3">
+        <a href="/terms">Syarat dan ketentuan</a> |{" "}
+        <a href="/privacy">Kebijakan Privasi</a>
+      </p>
+    </div>
+  );
+};
+
+const DashboardContent = ({ children, title = "beranda" }) => {
+  return (
+    <div className="p-9">
+      <h1 className="text-2xl font-semibold mb-6">{title}</h1>
+      {children}
+    </div>
+  );
+};
+
+DashboardContent.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node,
 };
 
 const SideBarMenu = ({ children, className, link }) => {
@@ -57,7 +102,7 @@ SideBar.propTypes = {
   children: PropTypes.node,
 };
 
-const Dashboard = ({ children, menu = "beranda" }) => {
+const Dashboard = ({ children, menu = "beranda", title }) => {
   const activeMenu = "bg-asnesia-darkblue text-asnesia-yellow";
 
   return (
@@ -108,39 +153,100 @@ const Dashboard = ({ children, menu = "beranda" }) => {
             link={`/order`}
             className={menu === "order" ? activeMenu : ""}
           >
-            <span className="flex gap-3 items-center text-lg"><FontAwesomeIcon icon={faWallet} />Pembayaran</span>
+            <span className="flex gap-3 items-center text-lg">
+              <FontAwesomeIcon icon={faWallet} />
+              Pembayaran
+            </span>
           </SideBarMenu>
 
           <SideBarMenu
             link={`/settings`}
             className={menu === "settings" ? activeMenu : ""}
           >
-            <span className="flex gap-3 items-center text-lg"><FontAwesomeIcon icon={faGear} />Pengaturan</span>
+            <span className="flex gap-3 items-center text-lg">
+              <FontAwesomeIcon icon={faGear} />
+              Pengaturan
+            </span>
           </SideBarMenu>
 
           <SideBarMenu
             link={`/Discuss`}
             className={menu === "discuss" ? activeMenu : ""}
           >
-            <span className="flex gap-3 items-center text-lg"><FontAwesomeIcon icon={faComment} />Disukusi</span>
+            <span className="flex gap-3 items-center text-lg">
+              <FontAwesomeIcon icon={faComment} />
+              Disukusi
+            </span>
           </SideBarMenu>
-          <Divider />
+          <div className="my-5">
+            <Divider />
+          </div>
           <SideBarMenu
             link={`/modul`}
             className={menu === "modul" ? activeMenu : ""}
           >
-            <span className="flex gap-3 items-center text-lg"><FontAwesomeIcon icon={faFolder} />Modul</span>
+            <span className="flex gap-3 items-center text-lg">
+              <FontAwesomeIcon icon={faFolder} />
+              Modul
+            </span>
           </SideBarMenu>
 
           <SideBarMenu
             link={`/video`}
             className={menu === "video" ? activeMenu : ""}
           >
-            <span className="flex gap-3 items-center text-lg"><FontAwesomeIcon icon={faPlay} />Video</span>
+            <span className="flex gap-3 items-center text-lg">
+              <FontAwesomeIcon icon={faPlay} />
+              Video
+            </span>
           </SideBarMenu>
         </div>
       </SideBar>
-      <DashboardContent>{children}</DashboardContent>
+      <div className="flex flex-col w-full">
+        <div className="flex header px-10 py-5 justify-end bg-asnesia-darkblue text-white hover:cursor-pointer">
+          <ButtonGroup variant="flat" color="none">
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button>
+                  <div className="user justify-items-center">
+                    <p className="text-lg font-semibold">NextUI</p>
+                    <p className="text-default-500">nextui.org</p>
+                  </div>
+                  <FontAwesomeIcon icon={faCaretDown} />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Merge options"
+                className="max-w-[300px]"
+                selectionMode="single"
+              >
+                <DropdownItem key="profile">
+                  <p className="flex gap-2">
+                    <FontAwesomeIcon icon={faUser} />
+                    <span>profil</span>
+                  </p>
+                </DropdownItem>
+                <DropdownItem key="change-password">
+                  <p className="flex gap-2">
+                    <FontAwesomeIcon icon={faKey} />
+                    <span>Ubah Password</span>
+                  </p>
+                </DropdownItem>
+                <DropdownItem key="logout">
+                  <p className="flex gap-2">
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    <span>Logout</span>
+                  </p>
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </ButtonGroup>
+        </div>
+
+        <DashboardContent title={title}>{children}</DashboardContent>
+        <DashboardFooter />
+      </div>
     </div>
   );
 };
@@ -148,6 +254,7 @@ const Dashboard = ({ children, menu = "beranda" }) => {
 Dashboard.propTypes = {
   children: PropTypes.node,
   menu: PropTypes.string,
+  title: PropTypes.string,
 };
 
 export default Dashboard;

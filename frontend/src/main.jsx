@@ -23,7 +23,7 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <Dashboard menu='beranda'>
+      <Dashboard menu='beranda' title='Beranda'>
         <Beranda />
       </Dashboard>
     ),
@@ -31,7 +31,7 @@ const router = createBrowserRouter([
   {
     path: "/service-puscharge",
     element: (
-      <Dashboard menu='my-packages'>
+      <Dashboard menu='my-packages' title='Paket Saya'>
         <Beranda />
       </Dashboard>
     ),
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
   {
     path: "/service-available",
     element: (
-      <Dashboard menu='service-available'>
+      <Dashboard menu='service-available' title='Cari Paket'>
         <Beranda />
       </Dashboard>
     ),
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
   {
     path: "/tryout",
     element: (
-      <Dashboard menu='tryout'>
+      <Dashboard menu='tryout' title='Riwayat Tryout'>
         <Beranda />
       </Dashboard>
     ),
@@ -55,7 +55,7 @@ const router = createBrowserRouter([
   {
     path: "/settings",
     element: (
-      <Dashboard menu='settings'>
+      <Dashboard menu='settings' title='Pengaturan'>
         <Beranda />
       </Dashboard>
     ),
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
   {
     path: "/order",
     element: (
-      <Dashboard menu='order'>
+      <Dashboard menu='order' title='Pembayaran'>
         <Beranda />
       </Dashboard>
     ),
@@ -71,7 +71,7 @@ const router = createBrowserRouter([
   {
     path: "/discuss",
     element: (
-      <Dashboard menu='discuss'>
+      <Dashboard menu='discuss' title='Diskusi'>
         <Beranda />
       </Dashboard>
     ),
@@ -79,7 +79,7 @@ const router = createBrowserRouter([
   {
     path: "/modul",
     element: (
-      <Dashboard menu='modul'>
+      <Dashboard menu='modul' title='Modul'>
         <Beranda />
       </Dashboard>
     ),
@@ -87,7 +87,7 @@ const router = createBrowserRouter([
   {
     path: "/video",
     element: (
-      <Dashboard menu='video'>
+      <Dashboard menu='video' title='Video'>
         <Beranda />
       </Dashboard>
     ),
