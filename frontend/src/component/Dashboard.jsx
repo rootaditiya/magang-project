@@ -49,8 +49,8 @@ const DashboardFooter = () => {
 
 const DashboardContent = ({ children, title = "beranda" }) => {
   return (
-    <div className="p-9">
-      <h1 className="text-2xl font-semibold mb-6">{title}</h1>
+    <div className="p-9 ">
+      <h1 className="text-3xl font-semibold mb-6">{title}</h1>
       {children}
     </div>
   );
@@ -202,8 +202,8 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
           </SideBarMenu>
         </div>
       </SideBar>
-      <div className="flex flex-col w-full">
-        <div className="flex header px-10 py-5 justify-end bg-asnesia-darkblue text-white hover:cursor-pointer">
+      <div className="flex flex-col w-full overflow-hidden h-screen">
+        <div className="sticky flex header px-10 py-5 justify-end bg-asnesia-darkblue text-white hover:cursor-pointer">
           <ButtonGroup variant="flat" color="none">
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
@@ -243,9 +243,10 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
             </Dropdown>
           </ButtonGroup>
         </div>
-
-        <DashboardContent title={title}>{children}</DashboardContent>
-        <DashboardFooter />
+        <div className="overflow-y-auto scrollbar-thin">
+          <DashboardContent title={title}>{children}</DashboardContent>
+          <DashboardFooter />
+        </div>
       </div>
     </div>
   );
