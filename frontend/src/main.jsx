@@ -17,13 +17,77 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/login-or-signup",
+    path: "/login-or-register",
     element: <LoginRegister />,
   },
   {
     path: "/dashboard",
     element: (
-      <Dashboard>
+      <Dashboard menu='beranda' title='Beranda'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/service-puscharge",
+    element: (
+      <Dashboard menu='my-packages' title='Paket Saya'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/service-available",
+    element: (
+      <Dashboard menu='service-available' title='Cari Paket'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/tryout",
+    element: (
+      <Dashboard menu='tryout' title='Riwayat Tryout'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <Dashboard menu='settings' title='Pengaturan'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/order",
+    element: (
+      <Dashboard menu='order' title='Pembayaran'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/discuss",
+    element: (
+      <Dashboard menu='discuss' title='Diskusi'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/modul",
+    element: (
+      <Dashboard menu='modul' title='Modul'>
+        <Beranda />
+      </Dashboard>
+    ),
+  },
+  {
+    path: "/video",
+    element: (
+      <Dashboard menu='video' title='Video'>
         <Beranda />
       </Dashboard>
     ),
