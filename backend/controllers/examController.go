@@ -117,40 +117,6 @@ func GetExams(c *gin.Context) {
 	c.JSON(http.StatusOK, exams)
 }
 
-// Get exams by packet ID
-func GetExamsByPacket(c *gin.Context) {
-	// Ambil parameter package_id dari query string
-	PacketID := c.Query("packet_id")
-	if PacketID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "packet_id is required"})
-		return
-	}
-
-	// Konversi package_id menjadi integer
-	id, err := strconv.Atoi(PacketID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid packet_id"})
-		return
-	}
-
-	// Query untuk mengambil semua exam berdasarkan package_id
-	var exams []models.Exam
-	if err := config.DB.Where("packet_id = ?", id).Find(&exams).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve exams", "details": err.Error()})
-		return
-	}
-
-	// Cek apakah data ditemukan
-	if len(exams) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "no exams found for the given packet_id"})
-		return
-	}
-
-	// Berikan response dalam format JSON
-	c.JSON(http.StatusOK, exams)
-}
-
-
 // Get an exam by ID
 func GetExamByID(c *gin.Context) {
 	var exam models.Exam
