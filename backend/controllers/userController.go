@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"time"
+
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -105,7 +106,15 @@ func Login(c *gin.Context) {
 	// }
 
 	// Cukup kirimkan pesan sukses
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"user": gin.H{
+			"id":       user.ID,
+			"name":     user.Name,
+			"email":    user.Email,
+			"phone":    user.PhoneNumber,
+		},
+	})
 }
 
 // Get all users
@@ -180,7 +189,7 @@ func UpdateUser(c *gin.Context) {
 		}
 		user.Password = hashedPassword
 	}
-	
+
 	user.Gender = input.Gender
 	user.PhoneNumber = input.PhoneNumber
 	user.EducationalInstitution = input.EducationalInstitution
