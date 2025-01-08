@@ -1,3 +1,4 @@
+import { AuthContext } from "../main";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Brand from "../assets/brand.svg";
 import {
@@ -15,7 +16,7 @@ import {
   Image,
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   faCaretDown,
   faChartLine,
@@ -31,6 +32,7 @@ import {
   faUser,
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
+import { useContext, useEffect, useState } from "react";
 
 const DashboardFooter = () => {
   return (
@@ -79,7 +81,7 @@ SideBarMenu.propTypes = {
   link: PropTypes.string,
 };
 
-const SideBar = ({ children }) => {
+const SideBar = ({ children, user }) => {
   return (
     <Card className="min-w-[250px] h-screen overflow-hidden" radius="none">
       <CardHeader className="flex gap-3 flex-col px-10">
@@ -89,8 +91,8 @@ const SideBar = ({ children }) => {
             className="w-28 h-28 text-large mt-5 mb-5"
             src="https://i.pravatar.cc/150?u=a04258114e29026708c"
           />
-          <p className="text-md font-semibold">NextUI</p>
-          <p className="text-small text-default-500">nextui.org</p>
+          <p className="text-md font-semibold">{user.name}</p>
+          <p className="text-small text-default-500">{user.email}</p>
         </div>
       </CardHeader>
       <CardBody>{children}</CardBody>
@@ -100,14 +102,42 @@ const SideBar = ({ children }) => {
 
 SideBar.propTypes = {
   children: PropTypes.node,
+  user: PropTypes.object,
 };
 
 const Dashboard = ({ children, menu = "beranda", title }) => {
+  const { auth } = useContext(AuthContext);
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Melakukan pengalihan setelah render pertama jika user tidak ada
+    if (!auth) {
+      navigate("/login-or-register");
+    }
+
+    fetch(`http://localhost:8080/users/${auth}`)
+      .then((response) => {
+        // Periksa jika respons berhasil
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json(); // Mengambil data dalam format JSON
+      })
+      .then((data) => {
+        console.log(data); // Menampilkan data yang diterima
+        setUser(data); // Mengupdate state dengan data yang diterima
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+      });
+  }, [auth, navigate]);
+
   const activeMenu = "bg-asnesia-darkblue text-asnesia-yellow";
 
   return (
     <div className={`dashboard flex`}>
-      <SideBar>
+      <SideBar user={user}>
         <div className="sidebar-content flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100">
           <SideBarMenu
             link={`/dashboard`}
@@ -253,6 +283,7 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
 };
 
 Dashboard.propTypes = {
+  // user: PropTypes.object,
   children: PropTypes.node,
   menu: PropTypes.string,
   title: PropTypes.string,

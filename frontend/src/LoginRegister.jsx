@@ -1,12 +1,47 @@
 import { Button, Card, CardBody, Input, Tab, Tabs } from "@nextui-org/react";
-import { useState } from "react";
-import { Link } from "react-router";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import Logo from "/logo.ico";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "./main";
+
+async function loginUser(credentials) {
+  return fetch('http://localhost:8080/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials)
+  })
+    .then(data => data.json())
+ }
 
 const LoginRegister = () => {
   const [selected, setSelected] = useState("login");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const {setUser} = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogin = async e => {
+    e.preventDefault();
+    if (!email || !password) {
+      alert("Email dan Password wajib diisi!");
+      return;
+    }
+
+    const user = await loginUser({
+      email,
+      password
+    });
+
+    if (user && user.message !== "Login successful") {
+      alert("Login gagal: " + user.error || "Terjadi kesalahan");
+      return;
+    }
+
+    setUser(user);
+    navigate("/dashboard");
+  }
 
   return (
     <div className="flex flex-col w-full h-screen justify-center items-center">
@@ -39,18 +74,21 @@ const LoginRegister = () => {
             onSelectionChange={setSelected}
           >
             <Tab key="login" title="Login">
-              <form className="flex flex-col gap-4">
+              <form className="flex flex-col gap-4" onSubmit={handleLogin}>
                 <Input
                   isRequired
                   label="Email"
                   placeholder="Enter your email"
                   type="email"
+                  onChange={e => setEmail(e.target.value)}
                 />
                 <Input
                   isRequired
                   label="Password"
                   placeholder="Enter your password"
                   type="password"
+                  // autoComplete="current-password"
+                  onChange={e => setPassword(e.target.value)}
                 />
                 <p className="text-center text-small">
                   Need to create an account?{" "}
@@ -59,7 +97,7 @@ const LoginRegister = () => {
                   </Link>
                 </p>
                 <div className="flex gap-2 justify-end">
-                  <Button fullWidth color="primary">
+                  <Button fullWidth color="primary" type="submit">
                     Login
                   </Button>
                 </div>
