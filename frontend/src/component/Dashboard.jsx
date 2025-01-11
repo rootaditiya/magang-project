@@ -36,7 +36,7 @@ import { useContext, useEffect, useState } from "react";
 
 const DashboardFooter = () => {
   return (
-    <div className="dashboard-footer bg-asnesia-darkblue text-white px-10 py-5">
+    <div className="dashboard-footer bg-asnesia-darkblue text-white px-10 py-5 mt-auto mb-0 w-full">
       <p>
         Copyright &copy; {new Date().getFullYear()}, All Rights Reserved.
         <span className="font-semibold ml-2">APPSKEP</span>
@@ -52,7 +52,7 @@ const DashboardFooter = () => {
 const DashboardContent = ({ children, title = "beranda" }) => {
   return (
     <div className="p-9 ">
-      <h1 className="text-3xl font-semibold mb-6">{title}</h1>
+      <h1 className="text-3xl font-semibold mb-6 w-full">{title}</h1>
       {children}
     </div>
   );
@@ -91,8 +91,10 @@ const SideBar = ({ children, user }) => {
             className="w-28 h-28 text-large mt-5 mb-5"
             src="https://i.pravatar.cc/150?u=a04258114e29026708c"
           />
-          <p className="text-md font-semibold">{user.name}</p>
-          <p className="text-small text-default-500">{user.email}</p>
+          <p className="text-md font-semibold">{user?.name || "Loading..."}</p>
+          <p className="text-small text-default-500">
+            {user?.email || "Loading..."}
+          </p>
         </div>
       </CardHeader>
       <CardBody>{children}</CardBody>
@@ -106,7 +108,8 @@ SideBar.propTypes = {
 };
 
 const Dashboard = ({ children, menu = "beranda", title }) => {
-  const { auth } = useContext(AuthContext);
+  const { getUser, removeUser } = useContext(AuthContext);
+  const [auth, setAuth] = useState(getUser());
   const [user, setUser] = useState({});
   const navigate = useNavigate();
 
@@ -114,7 +117,10 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
     // Melakukan pengalihan setelah render pertama jika user tidak ada
     if (!auth) {
       navigate("/login-or-register");
+      return;
     }
+
+    console.log(auth);
 
     fetch(`http://localhost:8080/users/${auth}`)
       .then((response) => {
@@ -134,6 +140,26 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
   }, [auth, navigate]);
 
   const activeMenu = "bg-asnesia-darkblue text-asnesia-yellow";
+
+  const handleLogout = () => {
+    try {
+      if (!auth) {
+        console.error("User is not authenticated.");
+        return;
+      }
+  
+      setAuth(null);  // Reset state
+      console.log("State updated to null.");
+      console.log("Logging out...");
+      removeUser(); // Hapus data user dari penyimpanan atau state
+      console.log("User data removed.");
+  
+      navigate("/login-or-register"); // Arahkan ke halaman login
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Terjadi kesalahan, coba lagi.");
+    }
+  };
 
   return (
     <div className={`dashboard flex`}>
@@ -239,8 +265,12 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
               <DropdownTrigger>
                 <Button>
                   <div className="user justify-items-center">
-                    <p className="text-lg font-semibold">NextUI</p>
-                    <p className="text-default-500">nextui.org</p>
+                    <p className="text-lg font-semibold">
+                      {user?.name || "Loading..."}
+                    </p>
+                    <p className="text-default-500">
+                      {user?.ID || "Loading..."}
+                    </p>
                   </div>
                   <FontAwesomeIcon icon={faCaretDown} />
                 </Button>
@@ -251,19 +281,23 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
                 className="max-w-[300px]"
                 selectionMode="single"
               >
-                <DropdownItem key="profile">
+                <DropdownItem key="profile" textValue="Profile">
                   <p className="flex gap-2">
                     <FontAwesomeIcon icon={faUser} />
-                    <span>profil</span>
+                    <span>Profil</span>
                   </p>
                 </DropdownItem>
-                <DropdownItem key="change-password">
+                <DropdownItem key="change-password" textValue="Change Password">
                   <p className="flex gap-2">
                     <FontAwesomeIcon icon={faKey} />
                     <span>Ubah Password</span>
                   </p>
                 </DropdownItem>
-                <DropdownItem key="logout">
+                <DropdownItem
+                  key="logout"
+                  textValue="Logout"
+                  onPress={handleLogout}
+                >
                   <p className="flex gap-2">
                     <FontAwesomeIcon icon={faRightFromBracket} />
                     <span>Logout</span>
@@ -273,7 +307,7 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
             </Dropdown>
           </ButtonGroup>
         </div>
-        <div className="overflow-y-auto scrollbar-thin">
+        <div className="flex flex-col overflow-y-auto scrollbar-thin h-full w-full">
           <DashboardContent title={title}>{children}</DashboardContent>
           <DashboardFooter />
         </div>

@@ -5,12 +5,14 @@ import { useContext, useEffect, useState } from "react";
 import PackagesList from "./component/PackagesList";
 import Package from "./component/Package";
 import { AuthContext } from './main';
+import { useNavigate } from 'react-router';
 
 const MyPackage = () => {
   const [category, setCategory] = useState("pppk");
   const [packages, setPackages] = useState([]);
+  const navigate = useNavigate();
 
-  const {auth} = useContext(AuthContext)
+  const {auth} = useContext(AuthContext);
 
   useEffect(() => {
     // Pastikan URL digabungkan dengan benar
@@ -68,11 +70,14 @@ const MyPackage = () => {
               return (
                 <Package
                   key={index}
-                  packageName={pack.NamePacket}
-                  packageDescription={pack.Description}
+                  packageName={pack.packet.NamePacket}
+                  packageDescription={pack.packet.Description}
                   // packagePrice={pack.Price}
                 >
-                  <Button className="bg-asnesia-yellow text-lg font-bold text-asnesia-darkblue px-8 py-6">
+                  <Button 
+                  className="bg-asnesia-yellow text-lg font-bold text-asnesia-darkblue px-8 py-6"
+                  onPress={()=>{navigate(`/service-puscharge/view/${pack.order_id}`)}}
+                  >
                     Lihat
                   </Button>
                 </Package>

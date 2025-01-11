@@ -11,8 +11,10 @@ import { NextUIProvider } from "@nextui-org/react";
 import MyPackage from "./MyPackage";
 import Tryout from "./Tryout";
 import PackageAvailable from "./PackageAvailable";
-import CardContent from "./component/CardContent";
 import { createContext, StrictMode } from "react";
+import PackageDetail from "./PackageDetail";
+import Exam from "./Exam";
+import ErrorPage2 from "./ErrorPage2";
 
 function setUser(user) {
   sessionStorage.setItem("user", JSON.stringify(user.user));
@@ -22,6 +24,15 @@ function getUser() {
   const userdata = sessionStorage.getItem("user");
   const user = JSON.parse(userdata);
   return user;
+}
+
+function removeUser() {
+  // Menghapus data user dari sessionStorage saat logout
+  if (sessionStorage.getItem('user')) {
+    sessionStorage.removeItem('user');
+  } else {
+    console.log("No user data found in localStorage.");
+  }
 }
 
 export const AuthContext = createContext(null)
@@ -111,17 +122,22 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/service-puscharge/view/:packageid",
+    path: "/service-puscharge/view/:orderid",
     element: (
-      <Dashboard menu="service-available" title="Paket Saya" user={auth}>
-        <Tryout />
+      <Dashboard menu="service-available" title="Paket Saya" >
+        <PackageDetail />
       </Dashboard>
     ),
   },
 
   {
     path: "/exams/:examid",
-    element: <CardContent user={auth} />,
+    element: <Exam />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/error", // Rute error khusus
+    element: <ErrorPage2 />, // Halaman error khusus
   },
 ]);
 
@@ -130,7 +146,7 @@ const root = createRoot(document.getElementById("root"));
 root.render(
   <StrictMode>
     <NextUIProvider>
-      <AuthContext.Provider value={{auth, setUser, getUser}}>
+      <AuthContext.Provider value={{auth, setUser, getUser, removeUser}}>
         <RouterProvider router={router} />
       </AuthContext.Provider>
     </NextUIProvider>

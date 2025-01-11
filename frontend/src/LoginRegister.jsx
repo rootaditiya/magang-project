@@ -7,46 +7,63 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "./main";
 
 async function loginUser(credentials) {
-  return fetch('http://localhost:8080/login', {
-    method: 'POST',
-    body: JSON.stringify(credentials)
-  })
-    .then(data => data.json())
- }
+  return fetch("http://localhost:8080/login", {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  }).then((data) => data.json());
+}
 
 const LoginRegister = () => {
   const [selected, setSelected] = useState("login");
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const {setUser} = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = async e => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       alert("Email dan Password wajib diisi!");
       return;
     }
 
-    const user = await loginUser({
-      email,
-      password
-    });
+    try {
+      // Mengirim data login ke server
+      const user = await loginUser({ email, password });
 
-    if (user && user.message !== "Login successful") {
-      alert("Login gagal: " + user.error || "Terjadi kesalahan");
-      return;
+      // Cek hasil login
+      if (user && user.message !== "Login successful") {
+        alert("Login gagal: " + (user.error || "Terjadi kesalahan"));
+        return;
+      }
+
+      new Promise((resolve) => {
+        setUser(user);
+        resolve();
+      })
+        .then(() => {
+          // Setelah data disimpan, lakukan navigasi ke dashboard
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 300);
+        })
+        .catch((err) => {
+          console.error("Error storing user data:", err);
+        });
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Terjadi kesalahan, coba lagi.");
     }
-
-    setUser(user);
-    navigate("/dashboard");
-  }
+  };
 
   return (
     <div className="flex flex-col w-full h-screen justify-center items-center">
       <Card className="max-w-full w-[400px] p-5">
-        <FontAwesomeIcon icon={faArrowLeft} className={`self-start text-2xl font-medium mb-5`}/>
+        <FontAwesomeIcon
+          icon={faArrowLeft}
+          className={`self-start text-2xl font-medium mb-5`}
+        />
 
         <div className="logo self-center mb-10">
           <img src={Logo} alt="" className={``} />
@@ -56,12 +73,16 @@ const LoginRegister = () => {
           {selected === "login" ? (
             <>
               <h2 className={`text-2xl`}>Masuk ke Asnesia</h2>
-              <p className={`w-4/5`}>Gunakan akun Appskep untuk melanjutkan ke Appskep CPNS</p>
+              <p className={`w-4/5`}>
+                Gunakan akun Appskep untuk melanjutkan ke Appskep CPNS
+              </p>
             </>
           ) : (
             <>
               <h2 className={`text-2xl`}>Daftar ke Asnesia</h2>
-              <p className={`w-4/5`}>Buat akun Appskep untuk melanjutkan ke Appskep CPNS</p>
+              <p className={`w-4/5`}>
+                Buat akun Appskep untuk melanjutkan ke Appskep CPNS
+              </p>
             </>
           )}
         </div>
@@ -80,19 +101,20 @@ const LoginRegister = () => {
                   label="Email"
                   placeholder="Enter your email"
                   type="email"
-                  onChange={e => setEmail(e.target.value)}
+                  autoComplete="current-email"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                   isRequired
                   label="Password"
                   placeholder="Enter your password"
                   type="password"
-                  // autoComplete="current-password"
-                  onChange={e => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <p className="text-center text-small">
                   Need to create an account?{" "}
-                  <Link size="sm" onPress={() => setSelected("sign-up")}>
+                  <Link size="sm" onClick={() => setSelected("sign-up")}>
                     Sign up
                   </Link>
                 </p>
@@ -110,6 +132,7 @@ const LoginRegister = () => {
                   label="Name"
                   placeholder="Enter your name"
                   type="text"
+                  autoComplete="current-name"
                 />
                 <Input
                   isRequired
@@ -122,16 +145,18 @@ const LoginRegister = () => {
                   label="Email"
                   placeholder="Enter your email"
                   type="email"
+                  autoComplete="current-email"
                 />
                 <Input
                   isRequired
                   label="Password"
                   placeholder="Enter your password"
                   type="password"
+                  autoComplete="current-password"
                 />
                 <p className="text-center text-small">
                   Already have an account?{" "}
-                  <Link size="sm" onPress={() => setSelected("login")}>
+                  <Link size="sm" onClick={() => setSelected("login")}>
                     Login
                   </Link>
                 </p>
