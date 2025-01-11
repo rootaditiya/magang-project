@@ -1,17 +1,22 @@
 import PropTypes from 'prop-types'
 import { Button } from "@nextui-org/react";
 import CardContent from "./component/CardContent";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PackagesList from "./component/PackagesList";
 import Package from "./component/Package";
+import { AuthContext } from './main';
+import { useNavigate } from 'react-router';
 
-const MyPackage = ({ user }) => {
+const MyPackage = () => {
   const [category, setCategory] = useState("pppk");
   const [packages, setPackages] = useState([]);
+  const navigate = useNavigate();
+
+  const {auth} = useContext(AuthContext);
 
   useEffect(() => {
     // Pastikan URL digabungkan dengan benar
-    fetch(`http://localhost:8080/packets-purchased/${user.id}`)
+    fetch(`http://localhost:8080/packets-purchased/${auth}`)
       .then((response) => {
         // Memeriksa jika respons berhasil
         if (!response.ok) {
@@ -26,7 +31,7 @@ const MyPackage = ({ user }) => {
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
       });
-  }, [user]); // Menambahkan dependensi user.id agar effect dijalankan saat user.id berubah
+  }, [auth]); // Menambahkan dependensi user.id agar effect dijalankan saat user.id berubah
 
   return (
     <div className="flex flex-col gap-8">
@@ -65,11 +70,14 @@ const MyPackage = ({ user }) => {
               return (
                 <Package
                   key={index}
-                  packageName={pack.NamePacket}
-                  packageDescription={pack.Description}
+                  packageName={pack.packet.NamePacket}
+                  packageDescription={pack.packet.Description}
                   // packagePrice={pack.Price}
                 >
-                  <Button className="bg-asnesia-yellow text-lg font-bold text-asnesia-darkblue px-8 py-6">
+                  <Button 
+                  className="bg-asnesia-yellow text-lg font-bold text-asnesia-darkblue px-8 py-6"
+                  onPress={()=>{navigate(`/service-puscharge/view/${pack.order_id}`)}}
+                  >
                     Lihat
                   </Button>
                 </Package>
