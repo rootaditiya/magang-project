@@ -94,37 +94,21 @@ const Exam = () => {
   const [timer, setTimer] = useState(0);
 
   const handleAnswerChange = (questionId, selectedLetter) => {
-    console.log("questionId:", questionId);
-    console.log("selectedLetter:", selectedLetter);
-
     setAnswers((prevAnswers) => {
       const existingAnswer = prevAnswers.find(
         (a) => a.question_id === questionId
       );
 
-      console.log("Existing answers:", prevAnswers);
-      console.log("Existing answer found:", existingAnswer);
+      const updatedAnswers = existingAnswer
+        ? prevAnswers.map((a) =>
+            a.question_id === questionId ? { ...a, answer: selectedLetter } : a
+          )
+        : [...prevAnswers, { question_id: questionId, answer: selectedLetter }];
 
-      if (existingAnswer) {
-        // Update the existing answer
-        const updatedAnswers = prevAnswers.map((a) =>
-          a.question_id === questionId ? { ...a, answer: selectedLetter } : a
-        );
+      // Simpan data ke localStorage
+      localStorage.setItem("answers", JSON.stringify(updatedAnswers));
 
-        console.log("Updated answers:", updatedAnswers);
-
-        return updatedAnswers;
-      } else {
-        // Add a new answer
-        const newAnswers = [
-          ...prevAnswers,
-          { question_id: questionId, answer: selectedLetter },
-        ];
-
-        console.log("New answers added:", newAnswers);
-
-        return newAnswers;
-      }
+      return updatedAnswers;
     });
   };
 
@@ -151,9 +135,46 @@ const Exam = () => {
       score: score, // Memasukkan skor ke dalam state examData
     }));
 
+    localStorage.removeItem("answers");
+    localStorage.removeItem("timer");
+
     const updatedExam = await updateExam(examid, score);
     console.log("Ujian berhasil diperbarui:", updatedExam);
+
     setEnded(true);
+  };
+
+  const fetchRemainingTime = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/exams/${examid}/remaining-time`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        const remainingTime = data.remaining_time;
+
+        // Gunakan regex untuk mengekstrak menit dan detik
+        const timeRegex = /(\d+)m(\d+\.\d+)s/;
+        const match = remainingTime.match(timeRegex);
+
+        if (match) {
+          const minutes = parseInt(match[1], 10); // Ekstrak menit
+          const seconds = parseInt(match[2], 10);
+
+          // Menghitung total detik
+          const totalSeconds = minutes * 60 + seconds;
+
+          // Set timer dengan total detik
+          setTimer(totalSeconds);
+        } else {
+          console.error("Format waktu tidak sesuai:", remainingTime);
+        }
+      } else {
+        console.error("Failed to fetch remaining time", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching remaining time", error);
+    }
   };
 
   const fetchExamData = async () => {
@@ -180,11 +201,20 @@ const Exam = () => {
       navigate("/login-or-register");
       return;
     }
+
     fetchExamData();
   }, [examid, auth, navigate]);
 
   useEffect(() => {
     if (examData) {
+      console.log("exam status =",examData)
+      if (examData.status === 1) {
+        setEnded(true); // Jika status = 1, ujian sudah selesai
+      } else {
+        setEnded(false); // Jika status = 0, ujian belum selesai
+        fetchRemainingTime(); // Ambil remaining time jika ujian belum selesai
+      }
+
       if (examData && examData.user_id !== auth) {
         navigate("/error", {
           state: {
@@ -197,10 +227,8 @@ const Exam = () => {
   }, [examData, auth, navigate]);
 
   useEffect(() => {
-    if (packageData?.duration_exam) {
-      // Set timer berdasarkan duration_exam dari packageData
-      setTimer(packageData.duration_exam);
-
+    if (packageData?.duration_exam && !ended) {
+      console.log(timer);
       const interval = setInterval(() => {
         setTimer((prevTimer) => {
           if (prevTimer <= 1) {
@@ -209,14 +237,28 @@ const Exam = () => {
             handleFinish(); // Panggil handleFinish saat waktu habis
             return 0;
           }
+
           return prevTimer - 1;
         });
       }, 1000); // Mengurangi timer setiap detik
 
-      // Hapus interval ketika komponen di-unmount atau ketika timer habis
       return () => clearInterval(interval);
     }
-  }, [packageData]);
+  }, [packageData, ended]);
+
+  useEffect(() => {
+    // Periksa jika ada data yang tersimpan di localStorage
+    const storedAnswers = localStorage.getItem("answers");
+    if (storedAnswers) {
+      setAnswers(JSON.parse(storedAnswers));
+    }
+
+    // Ambil timer dari localStorage jika ada
+    const storedTimer = localStorage.getItem("timer");
+    if (storedTimer) {
+      setTimer(JSON.parse(storedTimer));
+    }
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -225,7 +267,7 @@ const Exam = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       <div className="exam flex felx-row w-full h-full">
         <section className="exam-description h-full">
           <Card className="min-w-[250px] h-full overflow-hidden" radius="none">
@@ -304,6 +346,7 @@ const Exam = () => {
 
                     <RadioGroup
                       label="Select your Answer"
+                      defaultValue=""
                       value={
                         answers.find(
                           (answer) => answer.question_id === currentQuestion.id
@@ -368,6 +411,7 @@ const Exam = () => {
                         color={isAnswered ? "success" : "default"}
                         key={index}
                         size="sm"
+                        isDisabled={ended}
                         className={`p-5 ${
                           index === currentQuestionIndex
                             ? "border-2 border-asnesia-blue"
@@ -383,7 +427,12 @@ const Exam = () => {
               </div>
 
               <div className="finish-button mt-auto mb-10 ms-auto me-10">
-                <Button color="primary" size="lg" onPress={handleFinish}>
+                <Button
+                  isDisabled={ended}
+                  color="primary"
+                  size="lg"
+                  onPress={handleFinish}
+                >
                   Finish Exam?
                 </Button>
               </div>
@@ -401,7 +450,7 @@ const Exam = () => {
               size="lg"
               className="px-5 self-center"
               onPress={goToPreviousQuestion}
-              disabled={ended} // Menonaktifkan tombol jika ujian sudah selesai
+              isDisabled={ended} // Menonaktifkan tombol jika ujian sudah selesai
             >
               Sebelumnya
             </Button>
@@ -413,7 +462,7 @@ const Exam = () => {
               size="lg"
               className="px-5 self-center"
               onPress={goToNextQuestion}
-              disabled={ended} // Menonaktifkan tombol jika ujian sudah selesai
+              isDisabled={ended} // Menonaktifkan tombol jika ujian sudah selesai
             >
               Selanjutnya
             </Button>
