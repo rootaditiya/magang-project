@@ -13,10 +13,22 @@ async function loginUser(credentials) {
   }).then((data) => data.json());
 }
 
+async function signupUser(userDetails) {
+  return fetch("http://localhost:8080/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userDetails),
+  }).then((data) => data.json());
+}
+
 const LoginRegister = () => {
   const [selected, setSelected] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -57,13 +69,43 @@ const LoginRegister = () => {
     }
   };
 
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password || !phoneNumber) {
+      alert("Semua kolom harus diisi!");
+      return;
+    }
+
+    try {
+      // Mengirim data signup ke server
+      const response = await signupUser({
+        name,
+        email,
+        password,
+        phone_number: phoneNumber,
+      });
+
+      if (response.message === "User created successfully") {
+        alert("Pendaftaran berhasil! Silakan login.");
+        setSelected("login"); // Beralih ke tab login setelah sukses signup
+      } else {
+        alert("Pendaftaran gagal: " + (response.error || "Terjadi kesalahan"));
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Terjadi kesalahan, coba lagi.");
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-screen justify-center items-center">
       <Card className="max-w-full w-[400px] p-5">
-        <FontAwesomeIcon
-          icon={faArrowLeft}
-          className={`self-start text-2xl font-medium mb-5`}
-        />
+        <div className="p-3 cursor-pointer" onClick={() => navigate("/")}>
+          <FontAwesomeIcon
+            icon={faArrowLeft}
+            className={`self-start text-2xl font-medium`}
+          />
+        </div>
 
         <div className="logo self-center mb-10">
           <img src={Logo} alt="" className={``} />
@@ -126,19 +168,24 @@ const LoginRegister = () => {
               </form>
             </Tab>
             <Tab key="sign-up" title="Sign up">
-              <form className="flex flex-col gap-4 h-[300px]">
+              <form
+                className="flex flex-col gap-4 h-[300px]"
+                onSubmit={handleSignup}
+              >
                 <Input
                   isRequired
                   label="Name"
                   placeholder="Enter your name"
                   type="text"
                   autoComplete="current-name"
+                  onChange={(e) => setName(e.target.value)}
                 />
                 <Input
                   isRequired
                   label="Phone Number"
                   placeholder="ex: 08xxxxxxxxxx"
                   type="text"
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                 />
                 <Input
                   isRequired
@@ -146,6 +193,7 @@ const LoginRegister = () => {
                   placeholder="Enter your email"
                   type="email"
                   autoComplete="current-email"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                   isRequired
@@ -153,6 +201,7 @@ const LoginRegister = () => {
                   placeholder="Enter your password"
                   type="password"
                   autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <p className="text-center text-small">
                   Already have an account?{" "}
@@ -161,7 +210,7 @@ const LoginRegister = () => {
                   </Link>
                 </p>
                 <div className="flex gap-2 justify-end">
-                  <Button fullWidth color="primary">
+                  <Button fullWidth color="primary" type="submit">
                     Sign up
                   </Button>
                 </div>

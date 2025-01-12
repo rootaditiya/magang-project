@@ -1,37 +1,46 @@
-import PropTypes from 'prop-types'
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
+import PropTypes from "prop-types";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
 import PackageCategorys from "./component/PackageCategorys";
 import PackagesList from "./component/PackagesList";
 import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileZipper } from "@fortawesome/free-solid-svg-icons";
 import Package from "./component/Package";
-import { AuthContext } from './main';
-import { useNavigate } from 'react-router';
+import { AuthContext } from "./main";
+import { useNavigate } from "react-router";
+import CardContent from "./component/CardContent";
 
 const getCurrentDate = () => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Menambahkan leading zero jika bulan kurang dari 10
-  const day = today.getDate().toString().padStart(2, '0'); // Menambahkan leading zero jika tanggal kurang dari 10  
+  const month = (today.getMonth() + 1).toString().padStart(2, "0"); // Menambahkan leading zero jika bulan kurang dari 10
+  const day = today.getDate().toString().padStart(2, "0"); // Menambahkan leading zero jika tanggal kurang dari 10
   return `${year}-${month}-${day}`;
 };
-
 
 const PackageAvailable = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [packages, setPackages] = useState([]);
   const [selectedPackages, setSelectedPackages] = useState({});
-  const {auth } = useContext(AuthContext);
+  const { getUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const auth = getUser();
 
   const handleBeli = (paket, user) => {
     console.log(paket, user);
     fetch("http://localhost:8080/orders", {
-      method: "POST",  // Menentukan metode yang digunakan adalah POST
+      method: "POST", // Menentukan metode yang digunakan adalah POST
       headers: {
-        "Content-Type": "application/json",  // Menyatakan bahwa data yang dikirim dalam format JSON
+        "Content-Type": "application/json", // Menyatakan bahwa data yang dikirim dalam format JSON
       },
       body: JSON.stringify({
         id_user: user,
@@ -46,11 +55,11 @@ const PackageAvailable = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        console.log(response)
-        return response.json();  // Mengambil data dalam format JSON dari respons
+        console.log(response);
+        return response.json(); // Mengambil data dalam format JSON dari respons
       })
       .then((data) => {
-        console.log(data);  // Menampilkan data respons dari server
+        console.log(data); // Menampilkan data respons dari server
         alert("Payment success");
         navigate("/service-puscharge");
       })
@@ -60,7 +69,7 @@ const PackageAvailable = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/packets")
+    fetch(`http://localhost:8080/packets?user_id=${auth}`)
       .then((response) => {
         // Periksa jika respons berhasil
         if (!response.ok) {
@@ -79,7 +88,7 @@ const PackageAvailable = () => {
 
   return (
     <>
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -119,9 +128,9 @@ const PackageAvailable = () => {
         </section>
 
         <section className="packages-list ">
-          <PackagesList>
-          {packages.map((pack, index) => {
-              return (
+          {packages && packages.length > 0 ? (
+            <PackagesList>
+              {packages.map((pack, index) => (
                 <Package
                   key={index}
                   packageName={pack.NamePacket}
@@ -136,10 +145,19 @@ const PackageAvailable = () => {
                     Beli
                   </Button>
                 </Package>
-              );
-            })}
-
-          </PackagesList>
+              ))}
+            </PackagesList>
+          ) : (
+            // Jika packages kosong atau null, tampilkan CardContent
+            <CardContent
+              content="Belum ada paket terbaru nih :)"
+              description="Selamat karena kamu telah memesan semua paket yang tersedia"
+              button={{
+                title: "Lihat Paket Saya!",
+                link: "/service-puscharge",
+              }}
+            />
+          )}
         </section>
       </div>
     </>
@@ -147,7 +165,7 @@ const PackageAvailable = () => {
 };
 
 PackageAvailable.propTypes = {
-  user: PropTypes.object
-}
+  user: PropTypes.object,
+};
 
 export default PackageAvailable;

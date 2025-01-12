@@ -85,7 +85,9 @@ const SideBar = ({ children, user }) => {
   return (
     <Card className="min-w-[250px] h-screen overflow-hidden" radius="none">
       <CardHeader className="flex gap-3 flex-col px-10">
-        <Image alt="asnesia logo" radius="none" src={Brand} width={175} />
+        <Link to="/">
+          <Image alt="asnesia logo" radius="none" src={Brand} width={175} />
+        </Link>
         <div className="flex flex-col items-center">
           <Avatar
             className="w-28 h-28 text-large mt-5 mb-5"
@@ -120,7 +122,7 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
       return;
     }
 
-    console.log(auth);
+    console.log("user =", auth);
 
     fetch(`http://localhost:8080/users/${auth}`)
       .then((response) => {
@@ -147,13 +149,13 @@ const Dashboard = ({ children, menu = "beranda", title }) => {
         console.error("User is not authenticated.");
         return;
       }
-  
-      setAuth(null);  // Reset state
+
+      setAuth(null); // Reset state
       console.log("State updated to null.");
       console.log("Logging out...");
       removeUser(); // Hapus data user dari penyimpanan atau state
       console.log("User data removed.");
-  
+
       navigate("/login-or-register"); // Arahkan ke halaman login
     } catch (error) {
       console.error("Logout error:", error);
