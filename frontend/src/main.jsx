@@ -124,7 +124,7 @@ const router = createBrowserRouter([
   {
     path: "/service-puscharge/view/:orderid",
     element: (
-      <Dashboard menu="service-available" title="Paket Saya" >
+      <Dashboard menu="service-available" title="Detail Packet" >
         <PackageDetail />
       </Dashboard>
     ),
