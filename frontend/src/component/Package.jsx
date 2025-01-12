@@ -4,6 +4,7 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Chip,
   Divider,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +15,7 @@ const Package = ({
   packageName,
   packageDescription,
   packagePrice,
+  baru = false,
 }) => {
   return (
     <Card className="max-w-[400px] p-7 min-h-72">
@@ -21,6 +23,7 @@ const Package = ({
         <div className="flex flex-col text-center ">
           <p className="text-2xl font-bold">{packageName}</p>
         </div>
+        {baru && <Chip color="primary">Baru</Chip>}
       </CardHeader>
       <Divider />
       <CardBody className="text-md py-5 flex flex-col justify-center">
@@ -46,6 +49,7 @@ Package.propTypes = {
   packageDescription: PropTypes.string.isRequired,
   packagePrice: PropTypes.number,
   children: PropTypes.node,
+  baru: PropTypes.bool,
 };
 
 export default Package;

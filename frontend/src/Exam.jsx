@@ -5,8 +5,14 @@ import {
   CardHeader,
   Divider,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Radio,
   RadioGroup,
+  useDisclosure,
 } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router";
 import Brand from "./assets/brand.svg";
@@ -81,8 +87,8 @@ const updateExam = async (examId, score) => {
 
 const Exam = () => {
   const { examid } = useParams();
-  const { auth } = useContext(AuthContext);
-  // const auth = useState(getUser());
+  const { getUser } = useContext(AuthContext);
+  const auth = getUser();
   const navigate = useNavigate();
   const [examData, setExamData] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -92,6 +98,7 @@ const Exam = () => {
   const [answers, setAnswers] = useState([]);
   const [ended, setEnded] = useState(false);
   const [timer, setTimer] = useState(0);
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   const handleAnswerChange = (questionId, selectedLetter) => {
     setAnswers((prevAnswers) => {
@@ -207,7 +214,7 @@ const Exam = () => {
 
   useEffect(() => {
     if (examData) {
-      console.log("exam status =",examData)
+      console.log("exam status =", examData);
       if (examData.status === 1) {
         setEnded(true); // Jika status = 1, ujian sudah selesai
       } else {
@@ -268,6 +275,28 @@ const Exam = () => {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Peringantan</ModalHeader>
+              <ModalBody>
+                <p>
+                  Apakah anda sudah yakin untuk menyelesaikan exam?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Batal
+                </Button>
+                <Button color="primary" onPress={onClose} onClick={handleFinish}>
+                  Ya, saya yakin
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <div className="exam flex felx-row w-full h-full">
         <section className="exam-description h-full">
           <Card className="min-w-[250px] h-full overflow-hidden" radius="none">
@@ -333,9 +362,18 @@ const Exam = () => {
             {ended ? (
               // Jika ujian sudah selesai, tampilkan skor
               <Card>
-                <CardBody>
+                <CardBody className="flex justify-center text-center">
                   <p className="text-xl font-semibold">Skor Anda:</p>
-                  <p className="text-2xl">{examData.score}</p>
+                  <p className="text-2xl mb-10">{examData.score}</p>
+                  <Button
+                    color="warning"
+                    variant="ghost"
+                    size="lg"
+                    className="px-5 self-center"
+                    onPress={() => {navigate(`/service-puscharge/view/${examData.order_id}`)}}
+                  >
+                    Kembali
+                  </Button>
                 </CardBody>
               </Card>
             ) : (
@@ -431,7 +469,7 @@ const Exam = () => {
                   isDisabled={ended}
                   color="primary"
                   size="lg"
-                  onPress={handleFinish}
+                  onPress={onOpen}
                 >
                   Finish Exam?
                 </Button>

@@ -15,6 +15,8 @@ import { createContext, StrictMode } from "react";
 import PackageDetail from "./PackageDetail";
 import Exam from "./Exam";
 import ErrorPage2 from "./ErrorPage2";
+import CardContent from "./component/CardContent";
+import Order from "./Order";
 
 function setUser(user) {
   sessionStorage.setItem("user", JSON.stringify(user.user));
@@ -33,6 +35,9 @@ function removeUser() {
   } else {
     console.log("No user data found in localStorage.");
   }
+
+  localStorage.clear();
+  console.log("All data in localStorage has been cleared.");
 }
 
 export const AuthContext = createContext(null)
@@ -43,7 +48,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-    errorElement: <ErrorPage />,
+    // errorElement: <ErrorPage />,
   },
   {
     path: "/login-or-register",
@@ -85,7 +90,7 @@ const router = createBrowserRouter([
     path: "/settings",
     element: (
       <Dashboard menu="settings" title="Pengaturan">
-        <Tryout />
+        <CardContent />
       </Dashboard>
     ),
   },
@@ -93,7 +98,7 @@ const router = createBrowserRouter([
     path: "/order",
     element: (
       <Dashboard menu="order" title="Pembayaran">
-        <Tryout />
+        <Order />
       </Dashboard>
     ),
   },
@@ -101,7 +106,7 @@ const router = createBrowserRouter([
     path: "/discuss",
     element: (
       <Dashboard menu="discuss" title="Diskusi">
-        <Tryout />
+        <CardContent />
       </Dashboard>
     ),
   },
@@ -109,7 +114,7 @@ const router = createBrowserRouter([
     path: "/modul",
     element: (
       <Dashboard menu="modul" title="Modul">
-        <Tryout />
+        <CardContent />
       </Dashboard>
     ),
   },
@@ -117,7 +122,7 @@ const router = createBrowserRouter([
     path: "/video",
     element: (
       <Dashboard menu="video" title="Video">
-        <Tryout />
+        <CardContent />
       </Dashboard>
     ),
   },

@@ -136,6 +136,7 @@ const PackageDetail = () => {
         const exam = await checkExam(orderid);
         if (exam) {
           setExamData(exam);
+          console.log("data exam = ",exam);
         }
       }
     };
@@ -172,7 +173,7 @@ const PackageDetail = () => {
         {examData ? (
           examData.status === 0 ? (
             <Button
-              color="primary"
+              color="success"
               className="text-lg mt-10"
               onPress={() => handleContinue(examData.id)}
             >
